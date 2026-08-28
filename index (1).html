@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Support & Knowledge Portal</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===================== LOGIN SCREEN ===================== -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-box">
+    <h1>AI Support Portal</h1>
+    <p class="subtitle">Sign in to continue</p>
+
+    <div id="loginError" class="error-message hidden"></div>
+
+    <label for="username">Username</label>
+    <input type="text" id="username" placeholder="e.g. user or admin">
+
+    <label for="password">Password</label>
+    <input type="password" id="password" placeholder="Enter password">
+
+    <button id="loginBtn" class="btn-primary">Login</button>
+
+    <div class="hint-box">
+      <strong>Demo Accounts</strong>
+      <p>Customer &rarr; username: <b>user</b> / password: <b>user123</b></p>
+      <p>Admin &rarr; username: <b>admin</b> / password: <b>admin123</b></p>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MAIN APP ===================== -->
+<div id="app" class="app hidden">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>Support Portal</h2>
+      <p id="welcomeText"></p>
+    </div>
+
+    <nav class="nav-menu">
+      <!-- Customer navigation -->
+      <button class="nav-btn customer-only" data-target="dashboardSection">🏠 Dashboard</button>
+      <button class="nav-btn customer-only" data-target="kbSection">📚 Knowledge Base</button>
+      <button class="nav-btn customer-only" data-target="faqSection">❓ FAQ</button>
+      <button class="nav-btn customer-only" data-target="chatSection">💬 AI Chat</button>
+      <button class="nav-btn customer-only" data-target="ticketSection">🎫 My Support Tickets</button>
+      <button class="nav-btn customer-only" data-target="conversationsSection">🗂️ My Conversations</button>
+
+      <!-- Admin navigation -->
+      <button class="nav-btn admin-only" data-target="adminDashboardSection">📊 Dashboard</button>
+      <button class="nav-btn admin-only" data-target="adminKbSection">📚 Knowledge Articles</button>
+      <button class="nav-btn admin-only" data-target="adminFaqSection">❓ FAQs</button>
+      <button class="nav-btn admin-only" data-target="adminTicketsSection">🎫 Customer Tickets</button>
+      <button class="nav-btn admin-only" data-target="adminQuestionsSection">🤔 Customer Questions</button>
+      <button class="nav-btn admin-only" data-target="adminAnalyticsSection">📈 Analytics</button>
+    </nav>
+
+    <button id="logoutBtn" class="btn-secondary">🚪 Logout</button>
+  </aside>
+
+  <!-- Main content -->
+  <main class="content">
+
+    <!-- ===================== CUSTOMER: DASHBOARD ===================== -->
+    <section id="dashboardSection" class="page">
+      <h2>Welcome, <span id="dashUserName"></span> 👋</h2>
+      <p class="section-note">Here's an overview of your support portal.</p>
+
+      <div class="dashboard-search-row">
+        <input type="text" id="dashboardSearch" class="search-input dash-search" placeholder="Search Knowledge Base or FAQs...">
+        <button id="askAiBtn" class="btn-primary dash-ask-btn">🤖 Ask AI</button>
+      </div>
+
+      <div id="dashboardSearchResults" class="kb-list hidden"></div>
+      <div id="dashboardSearchEmpty" class="empty-state hidden">No results found for your search.</div>
+
+      <h3>Overview</h3>
+      <div class="dashboard-cards">
+        <div class="dash-card" data-target="kbSection">
+          <h4>📚 Knowledge Base</h4>
+          <p id="dashKbCount">0</p>
+          <span>Articles available</span>
+        </div>
+        <div class="dash-card" data-target="faqSection">
+          <h4>❓ FAQ</h4>
+          <p id="dashFaqCount">0</p>
+          <span>Common questions</span>
+        </div>
+        <div class="dash-card" data-target="ticketSection">
+          <h4>🎫 Support Tickets</h4>
+          <p id="dashTicketCount">0</p>
+          <span>Tickets you've submitted</span>
+        </div>
+      </div>
+
+      <h3>Quick Actions</h3>
+      <div class="quick-actions">
+        <button class="quick-action-btn" data-target="ticketSection">🎫 Submit a Ticket</button>
+        <button class="quick-action-btn" data-target="chatSection">💬 Chat with AI</button>
+        <button class="quick-action-btn" data-target="kbSection">📚 Browse Knowledge Base</button>
+        <button class="quick-action-btn" data-target="faqSection">❓ View FAQs</button>
+      </div>
+
+      <h3>Recent Conversations</h3>
+      <div id="dashRecentChats" class="ticket-list"></div>
+      <div id="dashRecentChatsEmpty" class="empty-state hidden">No recent conversations yet. Try the Ask AI button above.</div>
+    </section>
+
+    <!-- ===================== CUSTOMER: KNOWLEDGE BASE ===================== -->
+    <section id="kbSection" class="page hidden">
+      <h2>Knowledge Base</h2>
+
+      <div id="kbListView">
+        <input type="text" id="kbSearch" class="search-input" placeholder="Search articles by title or content...">
+        <div id="kbResults" class="kb-list"></div>
+        <div id="kbEmpty" class="empty-state hidden">No articles match your search. Try a different keyword.</div>
+      </div>
+
+      <div id="kbDetailView" class="kb-detail hidden">
+        <button id="kbBackBtn" class="btn-secondary kb-back-btn">← Back to Knowledge Base</button>
+        <span id="kbDetailCategory" class="kb-tag"></span>
+        <h3 id="kbDetailTitle"></h3>
+        <p id="kbDetailContent"></p>
+      </div>
+    </section>
+
+    <!-- ===================== CUSTOMER: FAQ ===================== -->
+    <section id="faqSection" class="page hidden">
+      <h2>Frequently Asked Questions</h2>
+      <input type="text" id="faqSearch" class="search-input" placeholder="Search FAQs...">
+      <div id="faqList" class="faq-list"></div>
+      <div id="faqEmpty" class="empty-state hidden">No FAQs match your search.</div>
+    </section>
+
+    <!-- ===================== CUSTOMER: AI CHAT ===================== -->
+    <section id="chatSection" class="page hidden">
+      <div class="chat-header-row">
+        <h2>AI Chat Assistant</h2>
+        <button id="clearChatBtn" class="btn-secondary clear-chat-btn">Clear Conversation</button>
+      </div>
+      <p class="section-note">Answers are generated from our company Knowledge Base.</p>
+
+      <div id="chatWindow" class="chat-window">
+        <div id="chatEmptyState" class="empty-state">No messages yet. Ask a question below to start chatting with the AI Assistant.</div>
+      </div>
+      <div id="chatLoading" class="loading-state hidden">AI is typing...</div>
+      <div class="chat-input-row">
+        <input type="text" id="chatInput" placeholder="Type your question...">
+        <button id="chatSendBtn" class="btn-primary">Send</button>
+      </div>
+    </section>
+
+    <!-- ===================== CUSTOMER: SUPPORT TICKETS ===================== -->
+    <section id="ticketSection" class="page hidden">
+      <h2>My Support Tickets</h2>
+
+      <h3>Create a New Ticket</h3>
+      <div id="ticketError" class="error-message hidden"></div>
+      <div id="ticketSuccess" class="success-message hidden"></div>
+
+      <label for="ticketSubject">Subject</label>
+      <input type="text" id="ticketSubject" placeholder="Brief summary of your issue">
+
+      <label for="ticketDescription">Description</label>
+      <textarea id="ticketDescription" rows="4" placeholder="Describe your issue in detail..."></textarea>
+
+      <div class="form-row">
+        <div class="form-col">
+          <label for="ticketCategory">Category</label>
+          <select id="ticketCategory">
+            <option value="Technical Support">Technical Support</option>
+            <option value="Web Development">Web Development</option>
+            <option value="AI Services">AI Services</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-col">
+          <label for="ticketPriority">Priority</label>
+          <select id="ticketPriority">
+            <option value="Low">Low</option>
+            <option value="Medium" selected>Medium</option>
+            <option value="High">High</option>
+          </select>
+        </div>
+      </div>
+
+      <button id="ticketSubmitBtn" class="btn-primary form-submit-btn">Submit Ticket</button>
+
+      <h3>My Tickets</h3>
+      <div id="myTicketsList" class="ticket-list"></div>
+      <div id="myTicketsEmpty" class="empty-state hidden">You have not submitted any tickets yet.</div>
+    </section>
+
+    <!-- ===================== CUSTOMER: MY CONVERSATIONS ===================== -->
+    <section id="conversationsSection" class="page hidden">
+      <h2>My Conversations</h2>
+
+      <div id="conversationsListView">
+        <div id="myConversationsList" class="ticket-list"></div>
+        <div id="myConversationsEmpty" class="empty-state hidden">No AI chat conversations yet. Start a chat in the AI Chat section.</div>
+      </div>
+
+      <div id="conversationDetailView" class="kb-detail hidden">
+        <button id="conversationBackBtn" class="btn-secondary kb-back-btn">← Back to My Conversations</button>
+        <h3 id="conversationDetailTitle"></h3>
+        <p id="conversationDetailDate" class="section-note"></p>
+        <div id="conversationDetailMessages" class="chat-window static-chat-window"></div>
+      </div>
+    </section>
+
+    <!-- ===================== ADMIN: DASHBOARD ===================== -->
+    <section id="adminDashboardSection" class="page hidden">
+      <h2>Admin Dashboard</h2>
+      <div class="card-grid">
+        <div class="stat-card"><h3 id="statTotalUsers">0</h3><p>Total Users</p></div>
+        <div class="stat-card"><h3 id="statTotalConversations">0</h3><p>Total Conversations</p></div>
+        <div class="stat-card"><h3 id="statQuestionsAsked">0</h3><p>Questions Asked</p></div>
+        <div class="stat-card"><h3 id="statOpenTickets">0</h3><p>Open Tickets</p></div>
+        <div class="stat-card"><h3 id="statResolvedTickets">0</h3><p>Resolved Tickets</p></div>
+        <div class="stat-card"><h3 id="statKbArticles">0</h3><p>Knowledge Articles</p></div>
+        <div class="stat-card"><h3 id="statUnanswered">0</h3><p>Unanswered Questions</p></div>
+      </div>
+      <p class="section-note">Use the menu on the left to manage Knowledge Articles, FAQs, customer tickets, and view detailed analytics.</p>
+    </section>
+
+    <!-- ===================== ADMIN: KNOWLEDGE ARTICLE MANAGEMENT ===================== -->
+    <section id="adminKbSection" class="page hidden">
+      <h2>Knowledge Article Management</h2>
+
+      <div id="adminKbListView">
+        <button id="addKbBtn" class="btn-primary form-submit-btn">+ Add New Article</button>
+        <div id="adminKbList" class="ticket-list admin-list-spacing"></div>
+        <div id="adminKbEmpty" class="empty-state hidden">No knowledge articles yet. Add your first article above.</div>
+      </div>
+
+      <div id="adminKbFormView" class="kb-detail hidden">
+        <h3 id="adminKbFormTitle">Add New Article</h3>
+        <input type="hidden" id="adminKbEditId">
+
+        <label for="adminKbTitle">Title</label>
+        <input type="text" id="adminKbTitle" placeholder="Article title">
+
+        <label for="adminKbCategory">Category</label>
+        <input type="text" id="adminKbCategory" placeholder="e.g. Web Development, AI Solutions, Cloud Services">
+
+        <label for="adminKbShortDesc">Short Description</label>
+        <input type="text" id="adminKbShortDesc" placeholder="One-line summary shown on the card">
+
+        <label for="adminKbContent">Content</label>
+        <textarea id="adminKbContent" rows="5" placeholder="Full article content"></textarea>
+
+        <div id="adminKbError" class="error-message hidden"></div>
+
+        <div class="form-btn-row">
+          <button id="adminKbSaveBtn" class="btn-primary form-submit-btn">Save Article</button>
+          <button id="adminKbCancelBtn" class="btn-secondary form-submit-btn">Cancel</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== ADMIN: FAQ MANAGEMENT ===================== -->
+    <section id="adminFaqSection" class="page hidden">
+      <h2>FAQ Management</h2>
+
+      <div id="adminFaqListView">
+        <button id="addFaqBtn" class="btn-primary form-submit-btn">+ Add New FAQ</button>
+        <div id="adminFaqList" class="ticket-list admin-list-spacing"></div>
+        <div id="adminFaqEmpty" class="empty-state hidden">No FAQs yet. Add your first FAQ above.</div>
+      </div>
+
+      <div id="adminFaqFormView" class="kb-detail hidden">
+        <h3 id="adminFaqFormTitle">Add New FAQ</h3>
+        <input type="hidden" id="adminFaqEditId">
+
+        <label for="adminFaqQuestion">Question</label>
+        <input type="text" id="adminFaqQuestion" placeholder="Frequently asked question">
+
+        <label for="adminFaqCategory">Category</label>
+        <input type="text" id="adminFaqCategory" placeholder="e.g. Pricing, Services, Technical Support">
+
+        <label for="adminFaqAnswer">Answer</label>
+        <textarea id="adminFaqAnswer" rows="4" placeholder="Answer to the question"></textarea>
+
+        <div id="adminFaqError" class="error-message hidden"></div>
+
+        <div class="form-btn-row">
+          <button id="adminFaqSaveBtn" class="btn-primary form-submit-btn">Save FAQ</button>
+          <button id="adminFaqCancelBtn" class="btn-secondary form-submit-btn">Cancel</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== ADMIN: CUSTOMER TICKETS ===================== -->
+    <section id="adminTicketsSection" class="page hidden">
+      <h2>Customer Tickets</h2>
+
+      <div id="adminTicketsListView">
+        <div id="adminTicketsList" class="ticket-list"></div>
+        <div id="adminTicketsEmpty" class="empty-state hidden">No tickets have been submitted yet.</div>
+      </div>
+
+      <div id="adminTicketDetailView" class="kb-detail hidden">
+        <button id="adminTicketBackBtn" class="btn-secondary kb-back-btn">← Back to Customer Tickets</button>
+
+        <h3 id="adminTicketSubject"></h3>
+        <p id="adminTicketMeta" class="section-note"></p>
+        <p id="adminTicketDescription"></p>
+
+        <label for="adminTicketStatusSelect">Status</label>
+        <select id="adminTicketStatusSelect">
+          <option value="Open">Open</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Waiting for Customer">Waiting for Customer</option>
+          <option value="Resolved">Resolved</option>
+          <option value="Closed">Closed</option>
+        </select>
+
+        <h4 class="comment-heading">Comments</h4>
+        <div id="adminTicketComments" class="ticket-list"></div>
+
+        <label for="adminTicketCommentInput">Add a Comment</label>
+        <textarea id="adminTicketCommentInput" rows="3" placeholder="Write an internal note or reply to the customer..."></textarea>
+        <button id="adminTicketCommentBtn" class="btn-primary form-submit-btn">Add Comment</button>
+      </div>
+    </section>
+
+    <!-- ===================== ADMIN: CUSTOMER QUESTIONS ===================== -->
+    <section id="adminQuestionsSection" class="page hidden">
+      <h2>Customer Questions the AI Could Not Answer</h2>
+      <div id="adminQuestionsList" class="ticket-list"></div>
+      <div id="adminQuestionsEmpty" class="empty-state hidden">No unanswered questions right now. Great job!</div>
+    </section>
+
+    <!-- ===================== ADMIN: ANALYTICS ===================== -->
+    <section id="adminAnalyticsSection" class="page hidden">
+      <h2>Analytics</h2>
+
+      <h3>Questions Over Time</h3>
+      <div id="questionsOverTimeChart" class="bar-stats"></div>
+      <div id="questionsOverTimeEmpty" class="empty-state hidden">No conversation data yet.</div>
+
+      <h3>Tickets by Status</h3>
+      <div id="ticketsByStatusChart" class="bar-stats"></div>
+    </section>
+
+  </main>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
